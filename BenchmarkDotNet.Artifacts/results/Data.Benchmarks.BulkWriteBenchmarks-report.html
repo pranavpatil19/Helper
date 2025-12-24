@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>Data.Benchmarks.BulkWriteBenchmarks-20251202-134604</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.13.12, macOS 15.6.1 (24G90) [Darwin 24.6.0]
+Apple M1 2.40GHz, 1 CPU, 8 logical and 8 physical cores
+.NET SDK 8.0.416
+  [Host]     : .NET 8.0.22 (8.0.2225.52707), Arm64 RyuJIT AdvSIMD
+  DefaultJob : .NET 8.0.22 (8.0.2225.52707), Arm64 RyuJIT AdvSIMD
+</code></pre>
+<pre><code></code></pre>
+
+<table>
+<thead><tr><th>Method</th><th>Mean</th><th>Error</th><th>StdDev</th><th>Gen0</th><th>Gen1</th><th>Allocated</th>
+</tr>
+</thead><tbody><tr><td>Write</td><td>5.054 ms</td><td>0.0821 ms</td><td>0.0878 ms</td><td>4968.7500</td><td>7.8125</td><td>29.75 MB</td>
+</tr><tr><td>WriteAsync</td><td>4.940 ms</td><td>0.0397 ms</td><td>0.0331 ms</td><td>4968.7500</td><td>7.8125</td><td>29.75 MB</td>
+</tr></tbody></table>
+</body>
+</html>

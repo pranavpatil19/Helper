@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Microsoft.AspNetCore.Components.Forms</id>
+    <version>6.0.8</version>
+    <authors>Microsoft</authors>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <icon>Icon.png</icon>
+    <projectUrl>https://asp.net/</projectUrl>
+    <description>Forms and validation support for Blazor applications.
+
+This package was built from the source code at https://github.com/dotnet/aspnetcore/tree/6a01dd1e69c8b9bd1ae005ea465ef2bcd26294bf</description>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <tags>aspnetcore components</tags>
+    <serviceable>true</serviceable>
+    <repository type="git" url="https://github.com/dotnet/aspnetcore" commit="6a01dd1e69c8b9bd1ae005ea465ef2bcd26294bf" />
+    <dependencies>
+      <group targetFramework="net6.0">
+        <dependency id="Microsoft.AspNetCore.Components" version="6.0.8" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

@@ -1,0 +1,86 @@
+# Solution Architecture
+
+## Feature Index
+- Project responsibilities table (Shared, DAL, CoreBusiness, MigrationRunner, Docs)
+- Dependency flow diagram and layering rules
+
+| Project | Responsibility | Notes |
+| --- | --- | --- |
+| `Shared` | Cross-cutting contracts, entities, and configuration primitives. | Targets `net8.0` so it works across server, console, or UI hosts. |
+| `DataAccessLayer` | Core ADO.NET helper plus optional EF modules (SQL Server, PostgreSQL, Oracle). | Adds provider-specific packages and exposes DI helpers plus a lightweight ADO.NET connection factory. |
+| `DataAccessLayer.Ado` | ADO-only packaging of the DAL. Shares source with `DataAccessLayer` but excludes `Common/DbHelper/EF` + `Database/ECM`. | Produces a slimmer assembly for workloads that never reach EF Core. |
+| `DataAccessLayer.Ef` | EF helper packaging. References `DataAccessLayer.Ado` and compiles only the EF folders plus the `AddEcmEntityFrameworkSupport` extension. | Lets hosts opt into EF helpers without pulling the full DAL. |
+| `CoreBusiness` | Domain-facing services that orchestrate repositories. | Keeps business logic independent of the hosting mechanism. |
+| `MigrationRunner` | Console utility that wires the DI graph, loads configuration, and runs EF Core migrations. | Ships with `appsettings.json` to document how to toggle providers. |
+| `Docs.Site` | Razor Class Library that can be referenced by any host to surface these docs plus markdown content. | Markdown files under `content/` are copied to the output for easy publishing. |
+
+## Dependency Flow
+```
+Shared → DataAccessLayer → CoreBusiness → (hosts like MigrationRunner)
+     ↘        ↘
+ DataAccessLayer.Ado   DataAccessLayer.Ef
+                ↘
+                 Docs.Site (documentation only)
+```
+*Business code never depends directly on infrastructure hosts, keeping test surfaces narrow.*
+
+## Feature Modules & Toggles
+
+- Optional subsystems (telemetry, bulk engines, EF helpers, provider helpers, transactions, resilience) live in their own folders within `DataAccessLayer/Common/DbHelper/**` with a single DI entry point (e.g., `Telemetry/TelemetryServiceCollectionExtensions.AddDalTelemetry`, `EF/AddEcmEntityFrameworkSupport`). Validation sits alongside them but is always registered. Removing a folder immediately breaks the build, making it obvious that the feature is unavailable until you re-add it. `DataAccessLayer.Ado` links every folder except `Common/DbHelper/EF`, while `DataAccessLayer.Ef` links only the EF folders and references the ADO assembly so both packages stay in lockstep.
+- `DalFeatureDefaults` centralizes the feature manifest:
+  ```csharp
+  // DataAccessLayer/Common/DbHelper/Configuration/DalFeatureDefaults.cs
+  private static DalFeatures CreateDefaultFeatures(DatabaseOptions options) =>
+      DalFeatures.Default with { EfHelpers = false }; // disable EF helpers globally
+  ```
+  Edit this method when you need to trim telemetry, bulk engines, EF helpers, transactions, resilience, or detailed logging. Because the defaults live in source, the DLL you ship already reflects the desired footprint. Validation is always registered and therefore omitted from the manifest.
+- Want to strip EF for now? Delete `Common/DbHelper/EF` and `Database/ECM`, set `features.EfHelpers = false`, and skip calling `AddEcmEntityFrameworkSupport`. When you need EF again, restore the folder (or cherry-pick the commit) and flip the flag back.
+- Quick start snippets for every feature live under `docs/feature-toggles/*.md`. Treat those files as the module “cheat sheet.”
+
+## Bulk Insert Paths
+
+Different workloads pick different APIs:
+
+| Scenario | Recommended API | Required Packages / Modules | Remove folder when unused |
+| --- | --- | --- | --- |
+| Pure ADO.NET ingestion | `IBulkWriteHelper` (uses provider engines automatically) | `DataAccessLayer` (built-in references to `Microsoft.Data.SqlClient`, `Npgsql`, `Oracle.ManagedDataAccess.Core`) with bulk engines enabled | Delete `Common/DbHelper/Bulk/Ado` to disable |
+| EF Core staying inside `DbContext` | `DataAccessLayer.EF.BulkExtensions` (e.g., `WriteSqlServerBulkAsync`) | `DataAccessLayer` + provider EF package (`Microsoft.EntityFrameworkCore.SqlServer`, `Npgsql.EntityFrameworkCore.PostgreSQL`, or `Oracle.EntityFrameworkCore`) + `AddEcmEntityFrameworkSupport` | Delete `Common/DbHelper/EF` + `Database/ECM` |
+| Mixed: LINQ read + ADO bulk write | Use EF/LINQ to project rows, then `IBulkWriteHelper` to insert | `DataAccessLayer` (bulk engines on) + provider EF package for the query side | Remove whichever branch you do not need |
+| Small LINQ batches | `DbContext.SaveChanges()` | Provider EF package only (bulk engines optional) | No change |
+
+Documented in detail inside `docs/bulk-operations.md`.
+
+## Deployment Modes & Optimization Plan
+
+1. **Pick the surface area you need.**
+   - *ADO-only:* reference `DataAccessLayer.Ado`, call `AddDataAccessLayer(options)`, and skip `AddEcmEntityFrameworkSupport`. Bulk engines, telemetry, validation, resilience, and DAL transaction helpers remain available for background ETL jobs or services that stay on raw ADO.NET.
+   - *EF-only:* reference both `DataAccessLayer.Ado` and `DataAccessLayer.Ef`. Call `AddDataAccessLayer(options)` + `AddEcmEntityFrameworkSupport(options)` and trim modules globally (bulk, transactions) via `DalFeatureDefaults` when you only need DbContexts.
+   - *Hybrid (default):* reference `DataAccessLayer` (which already includes both surfaces) or reference both new packages and call the same extension sequence. This lights up the full surface (ADO helper + EF helpers). Because every flag defaults to “on” except `DetailedLogging`, you only override the switches you want off.
+
+2. **Trim folders when you want a hard fail.**
+- Delete `Common/DbHelper/EF/**` + `Database/ECM/**` when you know EF helpers are not allowed; the solution will fail to build until the folders return or `EfHelpers` is re-enabled.
+   - Delete `Common/DbHelper/Bulk/Ado/**` if bulk is prohibited. Remember the EF bulk extensions use the same engines, so removing the folder disables bulk everywhere.
+   - Delete `Common/DbHelper/Transactions/**` when hosts are forbidden from using the DAL transaction manager. Leaving the folder but turning the flag off still works; deletion simply enforces the rule at compile time.
+
+3. **Keep documentation and tests in sync.**
+- `docs/configuration.md` now lists the three presets above plus the default toggle values and calls out which package (`DataAccessLayer`, `.Ado`, `.Ef`) is required.
+- `docs/feature-index.md` and `docs/feature-toggles/*.md` describe each module, required packages, and how deleting a folder vs. flipping a flag affects the build. Treat them as the official reference for auditors.
+- `DalFeatureToggleTests` exercises the core switches (telemetry, bulk engines, resilience, logging), `AdoAndEfParityTests` keep the combined surface honest, while `DataAccessLayer.Ado.Tests` and `DataAccessLayer.Ef.Tests` smoke-test the standalone packages. Add a similar test whenever a new module becomes optional so CI proves the “off” path works.
+
+4. **Validate builds before shipping.**
+   - Run `dotnet test` from the repo root. This executes `DataAccessLayer.Tests` (covers helper, bulk, transactions, feature toggles) and `MigrationRunner.Tests` (covers configuration + DI wiring). Passing tests are the safety net that the selected preset still composes correctly.
+   - For minimal deployments (e.g., deleting folders), run `dotnet build` immediately after removal to confirm there are no lingering references to the deleted modules.
+
+Following this plan lets you turn optional features on/off via `DalFeatureDefaults` while retaining the ability to hard-delete modules for stricter environments. The documentation and tests called out above are the source of truth, so auditors can see exactly which features are present in each build.
+
+## Scenario Coverage & Commands
+
+| Scenario | Project(s) | Validation | Benchmark |
+| --- | --- | --- | --- |
+| **ADO-only bulk + helpers** | `DataAccessLayer.Ado` | `dotnet test tests/DataAccessLayer.Ado.Tests/DataAccessLayer.Ado.Tests.csproj` | `dotnet run -c Release --project DataAccessLayer.Ado.Benchmarks` |
+| **EF-only (DbContexts, migrations, bulk)** | `DataAccessLayer.Ef` | `dotnet test tests/DataAccessLayer.Ef.Tests/DataAccessLayer.Ef.Tests.csproj` | (shares the combined benchmark suite when run with EF provider settings) |
+| **Combined DAL (ADO + EF)** | `DataAccessLayer`, `MigrationRunner` | `dotnet test tests/DataAccessLayer.Tests/DataAccessLayer.Tests.csproj`<br>`dotnet test tests/MigrationRunner.Tests/MigrationRunner.Tests.csproj` | `dotnet run -c Release --project Data.Benchmarks -- --filter "*BulkWriteBenchmarks*"` |
+
+Use this matrix as the quick reference when deciding which package/test/benchmark combination to run for a deployment. Each row maps directly to the three deployment modes described earlier (ADO-only, EF-only, hybrid). If you introduce another scenario (e.g., linq2db bulk copy), add a row with the associated project, test suite, and benchmark command.
+
+> EF builds now reference `linq2db.EntityFrameworkCore` 8.1.0. Calling `.UseLinqToDB()` inside the `AddEcmEntityFrameworkSupport` options hook lights up linq2db bulk copy APIs alongside the DAL bulk engines when you need that integration.

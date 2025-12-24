@@ -1,0 +1,14 @@
+# Migration Runner
+
+## Feature Index
+- Configuration overrides (`appsettings.json`, environment variables)
+- Build/run commands
+- Hosted service behavior
+
+1. Update the `Database` section inside `MigrationRunner/appsettings.json` or override via environment variables (e.g. `Database__Provider=Oracle`).  
+2. Build the solution: `dotnet build Helper.sln`.  
+3. Run migrations: `dotnet run --project MigrationRunner/MigrationRunner.csproj`.
+
+The console host bootstraps the same DI setup that any other host can reuse. `MigrationHostedService` resolves `IMigrationService`, executes `DbContext.Database.MigrateAsync`, and shuts down once the schema is up to date.
+
+Because the runner only depends on the shared libraries, it can be deployed as a lightweight container that shares the same binaries as your API/UI host.

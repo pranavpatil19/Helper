@@ -1,0 +1,89 @@
+# Database Support
+
+## Feature Index
+- Provider matrix (SQL Server, PostgreSQL, Oracle) with EF + ADO providers
+- Minimal configuration sample (`DatabaseOptions` JSON)
+- Overview of `IDatabaseHelper` inputs/outputs and sample usage
+
+The `DataAccessLayer` is configured through the `Shared.Configuration.DatabaseOptions` record. It supports three providers out of the box:
+
+| Provider | EF Core Provider Package | ADO.NET Provider |
+| --- | --- | --- |
+| `SqlServer` | `Microsoft.EntityFrameworkCore.SqlServer` | `Microsoft.Data.SqlClient` |
+| `PostgreSql` | `Npgsql.EntityFrameworkCore.PostgreSQL` | `Npgsql` |
+| `Oracle` | `Oracle.EntityFrameworkCore` | `Oracle.ManagedDataAccess.Core` |
+
+Minimal configuration example (see `MigrationRunner/appsettings.json`):
+
+```json
+{
+  "Database": {
+    "Provider": "PostgreSql",
+    "ConnectionString": "Host=localhost;Database=HelperDb;Username=postgres;Password=postgres"
+  }
+}
+```
+
+Inject `DatabaseOptions` and call `services.AddDataAccessLayer(options)` to wire up the ADO.NET helper surface. When you also need Entity Framework Core, chain `services.AddEcmEntityFrameworkSupport(options)` to register provider-specific DbContexts, repositories, and `IMigrationService` for migration orchestration.
+
+## Database Helper (Shared + DAL)
+
+`DataAccessLayer.Execution` now provides `DbCommandRequest`, `DbParameterDefinition`, `DbExecutionResult`, and `DbQueryResult<T>` so callers can describe commands in a provider-neutral way. The DAL registers `IDatabaseHelper` with the default `DatabaseHelper` implementation so any service can request it from DI.
+
+Key capabilities:
+- Sync + async methods for non-query, scalar, streaming, `DataTable`, and `DataSet` patterns.
+- Output parameters and return values are captured in `DbExecutionResult`.
+- Works with ad-hoc ADO.NET connections or the shared factory (set `DbCommandRequest.Connection` when you already manage the connection/transaction).
+- Supports mapper delegates or `IAsyncEnumerable<T>` streaming for large payloads.
+
+Basic usage:
+
+```csharp
+var request = new DbCommandRequest
+{
+    CommandText = "dbo.GetPendingTodos",
+    CommandType = CommandType.StoredProcedure,
+    Parameters =
+    [
+        new DbParameterDefinition
+        {
+            Name = "Status",
+            Value = "Pending",
+            DbType = DbType.String,
+            Size = 32
+        }
+    ],
+    TraceName = "todo.get-pending"
+};
+
+DbQueryResult<IReadOnlyList<TodoItem>> result = await databaseHelper.QueryAsync(
+    request,
+    reader => new TodoItem
+    {
+        Id = reader.GetGuid(0),
+        Title = reader.GetString(1),
+        IsCompleted = reader.GetBoolean(2),
+        CreatedUtc = reader.GetDateTimeOffset(3)
+    },
+    cancellationToken);
+
+IReadOnlyList<TodoItem> items = result.Data;
+// OUT/RETURN values (if any) live here:
+var outputs = result.Execution.OutputParameters;
+```
+
+For low-level operations:
+
+```csharp
+var command = new DbCommandRequest
+{
+    CommandText = "UPDATE TodoItems SET IsCompleted = 1 WHERE Id = @Id",
+    Parameters =
+    [
+        new DbParameterDefinition { Name = "Id", Value = todoId, DbType = DbType.Guid }
+    ]
+};
+
+DbExecutionResult execution = await databaseHelper.ExecuteAsync(command, cancellationToken);
+_logger.LogInformation("Rows affected: {Rows}", execution.RowsAffected);
+```
