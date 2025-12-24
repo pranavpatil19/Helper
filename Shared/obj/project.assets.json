@@ -700,26 +700,25 @@
     ]
   },
   "packageFolders": {
-    "/Users/pranavpatil/.nuget/packages/": {}
+    "/home/runner/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/pranavpatil/Desktop/Helper/Shared/Shared.csproj",
+      "projectUniqueName": "/home/runner/work/Helper/Helper/Shared/Shared.csproj",
       "projectName": "Shared",
-      "projectPath": "/Users/pranavpatil/Desktop/Helper/Shared/Shared.csproj",
-      "packagesPath": "/Users/pranavpatil/.nuget/packages/",
-      "outputPath": "/Users/pranavpatil/Desktop/Helper/Shared/obj/",
+      "projectPath": "/home/runner/work/Helper/Helper/Shared/Shared.csproj",
+      "packagesPath": "/home/runner/.nuget/packages/",
+      "outputPath": "/home/runner/work/Helper/Helper/Shared/obj/",
       "projectStyle": "PackageReference",
       "centralPackageVersionsManagementEnabled": true,
       "configFilePaths": [
-        "/Users/pranavpatil/.nuget/NuGet/NuGet.Config"
+        "/home/runner/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
-        "/usr/local/share/dotnet/library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -812,7 +811,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.416/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.416/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
