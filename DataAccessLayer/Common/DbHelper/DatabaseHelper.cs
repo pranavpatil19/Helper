@@ -1496,11 +1496,22 @@ public sealed class DatabaseHelper : IDatabaseHelper
                 }
             });
 
+    /// <summary>
+    /// Ensures sequential access is enabled for streaming scenarios while preserving caller flags.
+    /// </summary>
     private static CommandBehavior EnsureSequentialBehavior(CommandBehavior behavior)
     {
-        return behavior == CommandBehavior.Default
-            ? CommandBehavior.SequentialAccess
-            : behavior | CommandBehavior.SequentialAccess;
+        if (behavior == CommandBehavior.Default)
+        {
+            return CommandBehavior.SequentialAccess;
+        }
+
+        if ((behavior & CommandBehavior.SequentialAccess) != 0)
+        {
+            return behavior;
+        }
+
+        return behavior | CommandBehavior.SequentialAccess;
     }
 
     private string GetCommandLabel(DbCommandRequest request) =>
