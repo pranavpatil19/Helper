@@ -66,7 +66,7 @@ namespace DataAccessLayer.Tests;
             };
 
             var enumerated = false;
-            await foreach (var _ in helper.StreamAsync(request, reader => reader.GetString(1)))
+            await foreach (var _ in helper.StreamAsync(request, reader => reader.GetString(reader.GetOrdinal("Text"))))
             {
                 enumerated = true;
             }
