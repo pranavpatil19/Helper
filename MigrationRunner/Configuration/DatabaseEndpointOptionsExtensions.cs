@@ -16,9 +16,6 @@ internal static class DatabaseEndpointOptionsExtensions
             Provider = endpoint.Provider,
             ConnectionString = connectionString,
             ConnectionStringPort = endpoint.Port,
-            EnableDetailedErrors = endpoint.EnableDetailedErrors,
-            EnableSensitiveDataLogging = endpoint.EnableSensitiveDataLogging,
-            WrapProviderExceptions = endpoint.WrapProviderExceptions,
             CommandTimeoutSeconds = endpoint.CommandTimeoutSeconds,
             ConnectionTimeoutSeconds = endpoint.ConnectionTimeoutSeconds
         };
@@ -26,11 +23,6 @@ internal static class DatabaseEndpointOptionsExtensions
 
     private static string ResolveConnectionString(DatabaseEndpointOptions endpoint)
     {
-        if (!string.IsNullOrWhiteSpace(endpoint.ConnectionString))
-        {
-            return endpoint.ConnectionString;
-        }
-
         try
         {
             return endpoint.Provider switch

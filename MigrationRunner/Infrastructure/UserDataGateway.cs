@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shared.Entities;
-using DataAccessLayer.Database.ECM.Interfaces;
+using DataAccessLayer.Database.ECM.DbContexts;
 
 namespace MigrationRunner.Infrastructure;
 

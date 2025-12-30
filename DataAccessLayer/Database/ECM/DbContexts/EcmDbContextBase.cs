@@ -10,7 +10,6 @@ namespace DataAccessLayer.Database.ECM.DbContexts;
 /// </summary>
 public abstract class EcmDbContextBase(DbContextOptions options) : DbContext(options)
 {
-    public DbSet<TodoItem> TodoItems => Set<TodoItem>();
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -51,7 +51,7 @@ public sealed class DatabaseHelperExceptionWrappingTests
         var helperOptions = new DbHelperOptions();
         var telemetry = new DataAccessTelemetry(helperOptions);
         var rowMapperFactory = new RowMapperFactory(helperOptions);
-        var features = DalFeatures.Default;
+        var runtimeOptions = new DalRuntimeOptions();
         return new DatabaseHelper(
             scopeManager,
             new ThrowingCommandFactory(),
@@ -59,7 +59,7 @@ public sealed class DatabaseHelperExceptionWrappingTests
             new ResilienceStrategy(options.Resilience, NullLogger<ResilienceStrategy>.Instance),
             NullLogger<DatabaseHelper>.Instance,
             telemetry,
-            features,
+            runtimeOptions,
             Array.Empty<IValidator<DbCommandRequest>>(),
             rowMapperFactory);
     }
@@ -100,10 +100,10 @@ public sealed class DatabaseHelperExceptionWrappingTests
 
     private sealed class ThrowingCommandFactory : IDbCommandFactory
     {
-        public DbCommand Rent(DbConnection connection, DbCommandRequest request) => new ThrowingCommand { Connection = connection };
-        public Task<DbCommand> RentAsync(DbConnection connection, DbCommandRequest request, CancellationToken cancellationToken = default)
-            => Task.FromResult(Rent(connection, request));
-        public void Return(DbCommand command) => command.Dispose();
+        public DbCommand GetCommand(DbConnection connection, DbCommandRequest request) => new ThrowingCommand { Connection = connection };
+        public Task<DbCommand> GetCommandAsync(DbConnection connection, DbCommandRequest request, CancellationToken cancellationToken = default)
+            => Task.FromResult(GetCommand(connection, request));
+        public void ReturnCommand(DbCommand command) => command.Dispose();
     }
 
     private sealed class ThrowingCommand : DbCommand

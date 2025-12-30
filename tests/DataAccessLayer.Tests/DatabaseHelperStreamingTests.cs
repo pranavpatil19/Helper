@@ -5,11 +5,11 @@ using System.Data.Common;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using DataAccessLayer.Execution;
-using DataAccessLayer.Common.DbHelper;
 using DataAccessLayer.Configuration;
+using DataAccessLayer.Execution;
 using DataAccessLayer.Mapping;
 using DataAccessLayer.Telemetry;
+using DataAccessLayer.Common.DbHelper;
 using FluentValidation;
 using Microsoft.Extensions.Logging.Abstractions;
 using Shared.Configuration;
@@ -19,10 +19,10 @@ namespace DataAccessLayer.Tests;
 
 #nullable enable
 
-    public sealed class DatabaseHelperStreamingTests
+public sealed class DatabaseHelperStreamingTests
+{
+    private static readonly DatabaseOptions Options = new()
     {
-        private static readonly DatabaseOptions Options = new()
-        {
         Provider = DatabaseProvider.SqlServer,
         ConnectionString = "Server=.;Database=Fake;Trusted_Connection=True;",
         Resilience = new ResilienceOptions { EnableCommandRetries = false }
@@ -33,7 +33,7 @@ namespace DataAccessLayer.Tests;
     {
         var factory = new StreamingCommandFactory();
         var helper = CreateHelper(factory);
-        var destination = new MemoryStream();
+        using var destination = new MemoryStream();
 
         var bytes = await helper.StreamColumnAsync(new DbCommandRequest { CommandText = "SELECT Blob" }, 0, destination);
 
@@ -52,57 +52,58 @@ namespace DataAccessLayer.Tests;
 
         Assert.Equal(5, count);
         Assert.Equal("Hello", writer.ToString());
+    }
+
+    [Fact]
+    public async Task StreamAsync_AppendsSequentialAccessFlagToCustomBehavior()
+    {
+        var factory = new StreamingCommandFactory();
+        var helper = CreateHelper(factory);
+        var request = new DbCommandRequest
+        {
+            CommandText = "SELECT Text",
+            CommandBehavior = CommandBehavior.SingleResult
+        };
+
+        var enumerated = false;
+        await foreach (var _ in helper.StreamAsync(request, reader => reader.GetString(reader.GetOrdinal("Text"))))
+        {
+            enumerated = true;
         }
 
-        [Fact]
-        public async Task StreamAsync_AppendsSequentialAccessFlagToCustomBehavior()
-        {
-            var factory = new StreamingCommandFactory();
-            var helper = CreateHelper(factory);
-            var request = new DbCommandRequest
-            {
-                CommandText = "SELECT Text",
-                CommandBehavior = CommandBehavior.SingleResult
-            };
+        var command = Assert.IsType<FakeCommand>(factory.LastCommand);
+        Assert.True(command.LastBehavior.HasFlag(CommandBehavior.SequentialAccess));
+        Assert.True(command.LastBehavior.HasFlag(CommandBehavior.SingleResult));
+        Assert.True(enumerated);
+    }
 
-            var enumerated = false;
-            await foreach (var _ in helper.StreamAsync(request, reader => reader.GetString(reader.GetOrdinal("Text"))))
-            {
-                enumerated = true;
-            }
+    [Fact]
+    public void StreamAsync_ThrowsWhenMapperIsNull()
+    {
+        var helper = CreateHelper(new StreamingCommandFactory());
+        var request = new DbCommandRequest { CommandText = "SELECT Text" };
 
-            var command = Assert.IsType<FakeCommand>(factory.LastCommand);
-            Assert.True(command.LastBehavior.HasFlag(CommandBehavior.SequentialAccess));
-            Assert.True(command.LastBehavior.HasFlag(CommandBehavior.SingleResult));
-            Assert.True(enumerated);
-        }
+        Assert.Throws<ArgumentNullException>(() => helper.StreamAsync<string>(request, mapper: null!));
+    }
 
-        [Fact]
-        public void StreamAsync_ThrowsWhenMapperIsNull()
-        {
-            var helper = CreateHelper(new StreamingCommandFactory());
-            var request = new DbCommandRequest { CommandText = "SELECT Text" };
+    [Fact]
+    public void StreamAsync_ThrowsWhenCommandTextMissing()
+    {
+        var helper = CreateHelper(new StreamingCommandFactory());
+        var request = new DbCommandRequest { CommandText = "   " };
 
-            Assert.Throws<ArgumentNullException>(() => helper.StreamAsync<string>(request, mapper: null!));
-        }
+        Assert.Throws<ArgumentException>(() => helper.StreamAsync(request, reader => reader.GetString(reader.GetOrdinal("Text"))));
+    }
 
-        [Fact]
-        public void StreamAsync_ThrowsWhenCommandTextMissing()
-        {
-            var helper = CreateHelper(new StreamingCommandFactory());
-            var request = new DbCommandRequest { CommandText = "   " };
-
-            Assert.Throws<ArgumentException>(() => helper.StreamAsync(request, reader => reader.GetString(reader.GetOrdinal("Text"))));
-        }
-
-        private static IDatabaseHelper CreateHelper(IDbCommandFactory commandFactory)
-        {
-            var connectionFactory = new FakeConnectionFactory();
-            var scopeManager = new ConnectionScopeManager(connectionFactory, Options);
-            var helperOptions = new DbHelperOptions();
+    private static IDatabaseHelper CreateHelper(IDbCommandFactory commandFactory)
+    {
+        var connectionFactory = new FakeConnectionFactory();
+        var scopeManager = new ConnectionScopeManager(connectionFactory, Options);
+        var helperOptions = new DbHelperOptions();
         var telemetry = new DataAccessTelemetry(helperOptions);
         var rowMapperFactory = new RowMapperFactory(helperOptions);
-        var features = DalFeatures.Default;
+        var runtimeOptions = new DalRuntimeOptions();
+
         return new DatabaseHelper(
             scopeManager,
             commandFactory,
@@ -110,31 +111,31 @@ namespace DataAccessLayer.Tests;
             new ResilienceStrategy(Options.Resilience, NullLogger<ResilienceStrategy>.Instance),
             NullLogger<DatabaseHelper>.Instance,
             telemetry,
-            features,
+            runtimeOptions,
             Array.Empty<IValidator<DbCommandRequest>>(),
             rowMapperFactory);
-        }
+    }
 
-        private sealed class StreamingCommandFactory : IDbCommandFactory
+    private sealed class StreamingCommandFactory : IDbCommandFactory
+    {
+        public FakeCommand? LastCommand { get; private set; }
+
+        public DbCommand GetCommand(DbConnection connection, DbCommandRequest request)
         {
-            public FakeCommand? LastCommand { get; private set; }
-
-            public DbCommand Rent(DbConnection connection, DbCommandRequest request)
-            {
-                var command = new FakeCommand();
-                LastCommand = command;
-                return command;
-            }
-
-            public Task<DbCommand> RentAsync(DbConnection connection, DbCommandRequest request, CancellationToken cancellationToken = default)
-            {
-                var command = new FakeCommand();
-                LastCommand = command;
-                return Task.FromResult<DbCommand>(command);
-            }
-
-            public void Return(DbCommand command) => command.Dispose();
+            var command = new FakeCommand();
+            LastCommand = command;
+            return command;
         }
+
+        public Task<DbCommand> GetCommandAsync(DbConnection connection, DbCommandRequest request, CancellationToken cancellationToken = default)
+        {
+            var command = new FakeCommand();
+            LastCommand = command;
+            return Task.FromResult<DbCommand>(command);
+        }
+
+        public void ReturnCommand(DbCommand command) => command.Dispose();
+    }
 
     private sealed class FakeConnectionFactory : IDbConnectionFactory
     {
@@ -144,8 +145,10 @@ namespace DataAccessLayer.Tests;
     private sealed class FakeConnection : DbConnection
     {
         private ConnectionState _state = ConnectionState.Closed;
+
         [System.Diagnostics.CodeAnalysis.AllowNull]
         public override string ConnectionString { get; set; } = string.Empty;
+
         public override string Database => "Fake";
         public override string DataSource => "Fake";
         public override string ServerVersion => "1.0";
@@ -165,23 +168,24 @@ namespace DataAccessLayer.Tests;
 
         [System.Diagnostics.CodeAnalysis.AllowNull]
         public override string CommandText { get; set; } = string.Empty;
+
         public override int CommandTimeout { get; set; } = 30;
         public override CommandType CommandType { get; set; } = CommandType.Text;
-        public override UpdateRowSource UpdatedRowSource { get; set; }
-            = UpdateRowSource.None;
+        public override UpdateRowSource UpdatedRowSource { get; set; } = UpdateRowSource.None;
+
         [System.Diagnostics.CodeAnalysis.AllowNull]
         protected override DbConnection? DbConnection { get; set; } = new FakeConnection();
+
         protected override DbParameterCollection DbParameterCollection { get; } = new FakeParameterCollection();
         protected override DbTransaction? DbTransaction { get; set; }
-            = null;
         public override bool DesignTimeVisible { get; set; }
-            = false;
 
         public override void Cancel() { }
         public override int ExecuteNonQuery() => 0;
         public override object ExecuteScalar() => new object();
         public override void Prepare() { }
         protected override DbParameter CreateDbParameter() => new FakeParameter();
+
         protected override DbDataReader ExecuteDbDataReader(CommandBehavior behavior)
         {
             LastBehavior = behavior;
@@ -237,12 +241,14 @@ namespace DataAccessLayer.Tests;
         public override int GetOrdinal(string name) => name == "Blob" ? 0 : 1;
         public override string GetString(int ordinal) => ordinal == 1 ? "Hello" : string.Empty;
         public override object GetValue(int ordinal) => ordinal == 1 ? "Hello" : new byte[] { 1, 2, 3 };
+
         public override int GetValues(object[] values)
         {
             values[0] = GetValue(0);
             values[1] = GetValue(1);
             return 2;
         }
+
         public override bool IsDBNull(int ordinal) => false;
         public override bool NextResult() => false;
         public override Task<bool> NextResultAsync(CancellationToken cancellationToken) => Task.FromResult(false);
@@ -274,12 +280,16 @@ namespace DataAccessLayer.Tests;
         public override DbType DbType { get; set; }
         public override ParameterDirection Direction { get; set; }
         public override bool IsNullable { get; set; }
+
         [System.Diagnostics.CodeAnalysis.AllowNull]
         public override string ParameterName { get; set; } = string.Empty;
+
         [System.Diagnostics.CodeAnalysis.AllowNull]
         public override string SourceColumn { get; set; } = string.Empty;
+
         [System.Diagnostics.CodeAnalysis.AllowNull]
         public override object Value { get; set; } = null!;
+
         public override bool SourceColumnNullMapping { get; set; }
         public override int Size { get; set; }
         public override void ResetDbType() { }

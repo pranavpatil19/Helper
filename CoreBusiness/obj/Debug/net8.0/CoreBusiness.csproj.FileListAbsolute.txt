@@ -15,3 +15,4 @@
 /Users/pranavpatil/Desktop/Helper/CoreBusiness/obj/Debug/net8.0/CoreBusiness.pdb
 /Users/pranavpatil/Desktop/Helper/CoreBusiness/obj/Debug/net8.0/ref/CoreBusiness.dll
 /Users/pranavpatil/Desktop/Helper/CoreBusiness/obj/Debug/net8.0/CoreBusi.864A126C.Up2Date
+/Users/pranavpatil/Desktop/Helper/CoreBusiness/obj/Debug/net8.0/CoreBusiness.sourcelink.json

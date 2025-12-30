@@ -9,8 +9,6 @@
       "DataAccessLayer.Tests/1.0.0": {
         "dependencies": {
           "DataAccessLayer": "1.0.0",
-          "DataAccessLayer.Ado": "1.0.0",
-          "DataAccessLayer.Ef": "1.0.0",
           "Microsoft.CodeAnalysis.NetAnalyzers": "8.0.0",
           "Microsoft.EntityFrameworkCore.InMemory": "8.0.6",
           "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
@@ -1680,47 +1678,6 @@
           }
         }
       },
-      "DataAccessLayer.Ado/1.0.0": {
-        "dependencies": {
-          "FluentValidation": "11.9.0",
-          "Microsoft.Data.SqlClient": "5.1.5",
-          "Microsoft.Extensions.Configuration.Binder": "8.0.1",
-          "Microsoft.Extensions.ObjectPool": "8.0.7",
-          "Npgsql": "8.0.4",
-          "Oracle.ManagedDataAccess.Core": "23.4.0",
-          "Polly": "8.0.0",
-          "Shared": "1.0.0"
-        },
-        "runtime": {
-          "DataAccessLayer.Ado.dll": {
-            "assemblyVersion": "1.0.0",
-            "fileVersion": "1.0.0.0"
-          }
-        }
-      },
-      "DataAccessLayer.Ef/1.0.0": {
-        "dependencies": {
-          "FluentValidation": "11.9.0",
-          "Microsoft.Data.SqlClient": "5.1.5",
-          "Microsoft.EntityFrameworkCore": "8.0.6",
-          "Microsoft.EntityFrameworkCore.SqlServer": "8.0.6",
-          "Microsoft.Extensions.Configuration.Binder": "8.0.1",
-          "Microsoft.Extensions.ObjectPool": "8.0.7",
-          "Npgsql": "8.0.4",
-          "Npgsql.EntityFrameworkCore.PostgreSQL": "8.0.4",
-          "Oracle.EntityFrameworkCore": "8.23.40",
-          "Oracle.ManagedDataAccess.Core": "23.4.0",
-          "Polly": "8.0.0",
-          "Shared": "1.0.0",
-          "linq2db.EntityFrameworkCore": "8.1.0"
-        },
-        "runtime": {
-          "DataAccessLayer.Ef.dll": {
-            "assemblyVersion": "1.0.0",
-            "fileVersion": "1.0.0.0"
-          }
-        }
-      },
       "Shared/1.0.0": {
         "runtime": {
           "Shared.dll": {
@@ -2788,16 +2745,6 @@
       "hashPath": "xunit.runner.visualstudio.2.5.4.nupkg.sha512"
     },
     "DataAccessLayer/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "DataAccessLayer.Ado/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "DataAccessLayer.Ef/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

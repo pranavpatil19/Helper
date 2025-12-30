@@ -1,4 +1,4 @@
-using DataAccessLayer.Database.ECM.Interfaces;
+using DataAccessLayer.Database.ECM.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 

@@ -163,3 +163,4 @@
 /Users/pranavpatil/Desktop/Helper/tests/CoreBusiness.Tests/obj/Debug/net8.0/CoreBusiness.Tests.pdb
 /Users/pranavpatil/Desktop/Helper/tests/CoreBusiness.Tests/obj/Debug/net8.0/CoreBusiness.Tests.genruntimeconfig.cache
 /Users/pranavpatil/Desktop/Helper/tests/CoreBusiness.Tests/obj/Debug/net8.0/ref/CoreBusiness.Tests.dll
+/Users/pranavpatil/Desktop/Helper/tests/CoreBusiness.Tests/obj/Debug/net8.0/CoreBusiness.Tests.sourcelink.json

@@ -98,7 +98,7 @@ public sealed class DatabaseHelperStoredProcedureTests
         var helperOptions = new DbHelperOptions();
         var telemetry = new DataAccessTelemetry(helperOptions);
         var rowMapperFactory = new RowMapperFactory(helperOptions);
-        var features = DalFeatures.Default;
+        var runtimeOptions = new DalRuntimeOptions();
         return new DatabaseHelper(
             scopeManager,
             commandFactory,
@@ -106,7 +106,7 @@ public sealed class DatabaseHelperStoredProcedureTests
             CreateResilienceStrategy(),
             NullLogger<DatabaseHelper>.Instance,
             telemetry,
-            features,
+            runtimeOptions,
             Array.Empty<IValidator<DbCommandRequest>>(),
             rowMapperFactory);
     }
@@ -127,7 +127,7 @@ public sealed class DatabaseHelperStoredProcedureTests
         var helperOptions = new DbHelperOptions();
         var telemetry = new DataAccessTelemetry(helperOptions);
         var rowMapperFactory = new RowMapperFactory(helperOptions);
-        var features = DalFeatures.Default;
+        var runtimeOptions = new DalRuntimeOptions();
         var helper = new DatabaseHelper(
             scopeManager,
             commandFactory,
@@ -135,7 +135,7 @@ public sealed class DatabaseHelperStoredProcedureTests
             CreateResilienceStrategy(),
             NullLogger<DatabaseHelper>.Instance,
             telemetry,
-            features,
+            runtimeOptions,
             Array.Empty<IValidator<DbCommandRequest>>(),
             rowMapperFactory);
 
@@ -170,7 +170,7 @@ public sealed class DatabaseHelperStoredProcedureTests
         public FakeDbCommand? LastCommand { get; private set; }
         public bool WasReturned { get; private set; }
 
-        public DbCommand Rent(DbConnection connection, DbCommandRequest request)
+        public DbCommand GetCommand(DbConnection connection, DbCommandRequest request)
         {
             LastRequest = request;
             LastCommand = new FakeDbCommand(ReaderRows)
@@ -180,12 +180,12 @@ public sealed class DatabaseHelperStoredProcedureTests
             return LastCommand;
         }
 
-        public Task<DbCommand> RentAsync(DbConnection connection, DbCommandRequest request, CancellationToken cancellationToken = default)
+        public Task<DbCommand> GetCommandAsync(DbConnection connection, DbCommandRequest request, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(Rent(connection, request));
+            return Task.FromResult(GetCommand(connection, request));
         }
 
-        public void Return(DbCommand command)
+        public void ReturnCommand(DbCommand command)
         {
             if (command is FakeDbCommand fake)
             {

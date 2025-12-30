@@ -12,7 +12,7 @@ namespace Data.Benchmarks;
 
 [MemoryDiagnoser]
 /// <summary>
-/// Benchmarks the pooled command rent/return cycle to catch regressions in command/parameter pooling.
+/// Benchmarks the pooled command get/return cycle to catch regressions in command/parameter pooling.
 /// </summary>
 public class DbCommandFactoryBenchmarks
 {
@@ -46,13 +46,13 @@ public class DbCommandFactoryBenchmarks
     }
 
     /// <summary>
-    /// Measures the cost of renting and returning a pooled command.
+    /// Measures the cost of getting and returning a pooled command.
     /// </summary>
     [Benchmark]
-    public void RentAndReturn()
+    public void GetAndReturn()
     {
-        var command = _factory.Rent(_connection, _request);
-        _factory.Return(command);
+        var command = _factory.GetCommand(_connection, _request);
+        _factory.ReturnCommand(command);
     }
 
     /// <summary>

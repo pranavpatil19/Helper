@@ -16,11 +16,5 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\DataAccessLayer\DataAccessLayer.csproj" />
-    <ProjectReference Include="..\..\DataAccessLayer.Ado\DataAccessLayer.Ado.csproj">
-      <Aliases>AdoDal</Aliases>
-    </ProjectReference>
-    <ProjectReference Include="..\..\DataAccessLayer.Ef\DataAccessLayer.Ef.csproj">
-      <Aliases>EfDal</Aliases>
-    </ProjectReference>
   </ItemGroup>
 </Project>

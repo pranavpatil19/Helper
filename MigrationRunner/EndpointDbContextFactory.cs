@@ -2,7 +2,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using DataAccessLayer.Common.DbHelper;
 using DataAccessLayer.Database.ECM.DbContexts;
-using DataAccessLayer.Database.ECM.Interfaces;
 using DataAccessLayer.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Shared.Configuration;

@@ -2799,51 +2799,6 @@
           "bin/placeholder/DataAccessLayer.dll": {}
         }
       },
-      "DataAccessLayer.Ado/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v8.0",
-        "dependencies": {
-          "FluentValidation": "11.9.0",
-          "Microsoft.Data.SqlClient": "5.1.5",
-          "Microsoft.Extensions.Configuration.Binder": "8.0.1",
-          "Microsoft.Extensions.ObjectPool": "8.0.7",
-          "Npgsql": "8.0.4",
-          "Oracle.ManagedDataAccess.Core": "23.4.0",
-          "Polly": "8.0.0",
-          "Shared": "1.0.0"
-        },
-        "compile": {
-          "bin/placeholder/DataAccessLayer.Ado.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/DataAccessLayer.Ado.dll": {}
-        }
-      },
-      "DataAccessLayer.Ef/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v8.0",
-        "dependencies": {
-          "FluentValidation": "11.9.0",
-          "Microsoft.Data.SqlClient": "5.1.5",
-          "Microsoft.EntityFrameworkCore": "8.0.6",
-          "Microsoft.EntityFrameworkCore.SqlServer": "8.0.6",
-          "Microsoft.Extensions.Configuration.Binder": "8.0.1",
-          "Microsoft.Extensions.ObjectPool": "8.0.7",
-          "Npgsql": "8.0.4",
-          "Npgsql.EntityFrameworkCore.PostgreSQL": "8.0.4",
-          "Oracle.EntityFrameworkCore": "8.23.40",
-          "Oracle.ManagedDataAccess.Core": "23.4.0",
-          "Polly": "8.0.0",
-          "Shared": "1.0.0",
-          "linq2db.EntityFrameworkCore": "8.1.0"
-        },
-        "compile": {
-          "bin/placeholder/DataAccessLayer.Ef.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/DataAccessLayer.Ef.dll": {}
-        }
-      },
       "Shared/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v8.0",
@@ -9140,16 +9095,6 @@
       "path": "../../DataAccessLayer/DataAccessLayer.csproj",
       "msbuildProject": "../../DataAccessLayer/DataAccessLayer.csproj"
     },
-    "DataAccessLayer.Ado/1.0.0": {
-      "type": "project",
-      "path": "../../DataAccessLayer.Ado/DataAccessLayer.Ado.csproj",
-      "msbuildProject": "../../DataAccessLayer.Ado/DataAccessLayer.Ado.csproj"
-    },
-    "DataAccessLayer.Ef/1.0.0": {
-      "type": "project",
-      "path": "../../DataAccessLayer.Ef/DataAccessLayer.Ef.csproj",
-      "msbuildProject": "../../DataAccessLayer.Ef/DataAccessLayer.Ef.csproj"
-    },
     "Shared/1.0.0": {
       "type": "project",
       "path": "../../Shared/Shared.csproj",
@@ -9159,8 +9104,6 @@
   "projectFileDependencyGroups": {
     "net8.0": [
       "DataAccessLayer >= 1.0.0",
-      "DataAccessLayer.Ado >= 1.0.0",
-      "DataAccessLayer.Ef >= 1.0.0",
       "Microsoft.CodeAnalysis.NetAnalyzers >= 8.0.0",
       "Microsoft.EntityFrameworkCore.InMemory >= 8.0.6",
       "Microsoft.Extensions.Logging.Abstractions >= 8.0.0",
@@ -9173,39 +9116,34 @@
     ]
   },
   "packageFolders": {
-    "/home/runner/work/Helper/.codeql-scratch/dbs/csharp/working/packages": {}
+    "/Users/pranavpatil/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/runner/work/Helper/Helper/tests/DataAccessLayer.Tests/DataAccessLayer.Tests.csproj",
+      "projectUniqueName": "/Users/pranavpatil/Desktop/Helper/tests/DataAccessLayer.Tests/DataAccessLayer.Tests.csproj",
       "projectName": "DataAccessLayer.Tests",
-      "projectPath": "/home/runner/work/Helper/Helper/tests/DataAccessLayer.Tests/DataAccessLayer.Tests.csproj",
-      "packagesPath": "/home/runner/work/Helper/.codeql-scratch/dbs/csharp/working/packages",
-      "outputPath": "/home/runner/work/Helper/Helper/tests/DataAccessLayer.Tests/obj/",
+      "projectPath": "/Users/pranavpatil/Desktop/Helper/tests/DataAccessLayer.Tests/DataAccessLayer.Tests.csproj",
+      "packagesPath": "/Users/pranavpatil/.nuget/packages/",
+      "outputPath": "/Users/pranavpatil/Desktop/Helper/tests/DataAccessLayer.Tests/obj/",
       "projectStyle": "PackageReference",
       "centralPackageVersionsManagementEnabled": true,
       "configFilePaths": [
-        "/home/runner/.nuget/NuGet/NuGet.Config"
+        "/Users/pranavpatil/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
+        "/usr/local/share/dotnet/library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "/home/runner/work/Helper/Helper/DataAccessLayer.Ado/DataAccessLayer.Ado.csproj": {
-              "projectPath": "/home/runner/work/Helper/Helper/DataAccessLayer.Ado/DataAccessLayer.Ado.csproj"
-            },
-            "/home/runner/work/Helper/Helper/DataAccessLayer.Ef/DataAccessLayer.Ef.csproj": {
-              "projectPath": "/home/runner/work/Helper/Helper/DataAccessLayer.Ef/DataAccessLayer.Ef.csproj"
-            },
-            "/home/runner/work/Helper/Helper/DataAccessLayer/DataAccessLayer.csproj": {
-              "projectPath": "/home/runner/work/Helper/Helper/DataAccessLayer/DataAccessLayer.csproj"
+            "/Users/pranavpatil/Desktop/Helper/DataAccessLayer/DataAccessLayer.csproj": {
+              "projectPath": "/Users/pranavpatil/Desktop/Helper/DataAccessLayer/DataAccessLayer.csproj"
             }
           }
         }
@@ -9324,22 +9262,12 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "downloadDependencies": [
-          {
-            "name": "Microsoft.AspNetCore.App.Ref",
-            "version": "[8.0.22, 8.0.22]"
-          },
-          {
-            "name": "Microsoft.NETCore.App.Ref",
-            "version": "[8.0.22, 8.0.22]"
-          }
-        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.416/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.416/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

@@ -188,3 +188,4 @@
 /Users/pranavpatil/Desktop/Helper/tests/MigrationRunner.Tests/obj/Debug/net8.0/ref/MigrationRunner.Tests.dll
 /Users/pranavpatil/Desktop/Helper/tests/MigrationRunner.Tests/bin/Debug/net8.0/linq2db.dll
 /Users/pranavpatil/Desktop/Helper/tests/MigrationRunner.Tests/bin/Debug/net8.0/linq2db.EntityFrameworkCore.dll
+/Users/pranavpatil/Desktop/Helper/tests/MigrationRunner.Tests/obj/Debug/net8.0/MigrationRunner.Tests.sourcelink.json

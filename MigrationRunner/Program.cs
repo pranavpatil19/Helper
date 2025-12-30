@@ -1,4 +1,4 @@
-using DataAccessLayer.Database.ECM.Interfaces;
+using DataAccessLayer.Database.ECM.DbContexts;
 using DataAccessLayer.Exceptions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,24 +20,7 @@ builder.Services.Configure<MigrationRunnerOptions>(runnerSection);
 var runnerOptions = runnerSection.Get<MigrationRunnerOptions>()
     ?? throw new DalConfigurationException($"Missing '{MigrationRunnerOptions.SectionName}' configuration.");
 
-var sourceRegistration = EndpointRegistration.FromOptions(runnerOptions.Source
-    ?? throw new DalConfigurationException("Source database configuration is missing."));
-var destinationRegistration = EndpointRegistration.FromOptions(runnerOptions.Destination
-    ?? throw new DalConfigurationException("Destination database configuration is missing."));
-
-builder.Services.AddMigrationEndpoints(sourceRegistration, destinationRegistration);
-builder.Services
-    .AddScoped<ISourceUserDataGateway>(sp =>
-        new EndpointUserDataGateway(
-            sp.GetRequiredService<ISourceDbContextFactory>(),
-            sp.GetRequiredService<ILogger<EndpointUserDataGateway>>()))
-    .AddScoped<IDestinationUserDataGateway>(sp =>
-        new EndpointUserDataGateway(
-            sp.GetRequiredService<IDestinationDbContextFactory>(),
-            sp.GetRequiredService<ILogger<EndpointUserDataGateway>>()))
-    .AddScoped<IUserSynchronizationService, UserSynchronizationService>();
-
-builder.Services.AddHostedService<MigrationHostedService>();
+builder.Services.AddMigrationRunnerServices(runnerOptions);
 
 var host = builder.Build();
 await host.RunAsync().ConfigureAwait(false);

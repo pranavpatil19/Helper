@@ -63,14 +63,14 @@ public sealed class DbCommandFactory : IDbCommandFactory
     }
 
     /// <summary>
-    /// Rents a command for the supplied connection/request pair and prepares it when requested.
+    /// Gets a command for the supplied connection/request pair and prepares it when requested.
     /// </summary>
     /// <param name="connection">Open database connection.</param>
     /// <param name="request">Command request describing text, parameters, and timeouts.</param>
     /// <returns>A provider command ready for execution.</returns>
-    public DbCommand Rent(DbConnection connection, DbCommandRequest request)
+    public DbCommand GetCommand(DbConnection connection, DbCommandRequest request)
     {
-        var command = RentCore(connection, request);
+        var command = GetCommandCore(connection, request);
         if (request.PrepareCommand)
         {
             command.PrepareAsync(CancellationToken.None).GetAwaiter().GetResult();
@@ -80,15 +80,15 @@ public sealed class DbCommandFactory : IDbCommandFactory
     }
 
     /// <summary>
-    /// Rents a command asynchronously for the supplied connection/request pair.
+    /// Gets a command asynchronously for the supplied connection/request pair.
     /// </summary>
     /// <param name="connection">Open database connection.</param>
     /// <param name="request">Command request describing text, parameters, and timeouts.</param>
     /// <param name="cancellationToken">Propagation token for asynchronous preparation.</param>
     /// <returns>A provider command ready for execution.</returns>
-    public async Task<DbCommand> RentAsync(DbConnection connection, DbCommandRequest request, CancellationToken cancellationToken = default)
+    public async Task<DbCommand> GetCommandAsync(DbConnection connection, DbCommandRequest request, CancellationToken cancellationToken = default)
     {
-        var command = RentCore(connection, request);
+        var command = GetCommandCore(connection, request);
         if (request.PrepareCommand)
         {
             await command.PrepareAsync(cancellationToken).ConfigureAwait(false);
@@ -102,10 +102,10 @@ public sealed class DbCommandFactory : IDbCommandFactory
     /// </summary>
     /// <param name="command">Command to recycle.</param>
     /// <remarks>
-    /// Returning commands enables parameter pooling (and therefore DbType reuse). Call this method for both `Rent` and `RentAsync`
+    /// Returning commands enables parameter pooling (and therefore DbType reuse). Call this method for both `GetCommand` and `GetCommandAsync`
     /// even when the underlying execution path is synchronous.
     /// </remarks>
-    public void Return(DbCommand command)
+    public void ReturnCommand(DbCommand command)
     {
         ArgumentNullException.ThrowIfNull(command);
 
@@ -119,14 +119,14 @@ public sealed class DbCommandFactory : IDbCommandFactory
         command.Dispose();
     }
 
-    private DbCommand RentCore(DbConnection connection, DbCommandRequest request)
+    private DbCommand GetCommandCore(DbConnection connection, DbCommandRequest request)
     {
         ArgumentNullException.ThrowIfNull(connection);
         ArgumentNullException.ThrowIfNull(request);
 
         if (connection.State != ConnectionState.Open)
         {
-            throw new InvalidOperationException("Connection must be open before renting commands.");
+            throw new InvalidOperationException("Connection must be open before getting commands.");
         }
 
         var provider = (request.OverrideOptions ?? _defaultOptions).Provider;

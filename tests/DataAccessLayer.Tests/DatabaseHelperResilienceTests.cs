@@ -40,7 +40,7 @@ public sealed class DatabaseHelperResilienceTests
         var helperOptions = new DbHelperOptions();
         var telemetry = new DataAccessTelemetry(helperOptions);
         var rowMapperFactory = new RowMapperFactory(helperOptions);
-        var features = DalFeatures.Default;
+        var runtimeOptions = new DalRuntimeOptions();
         var helper = new DatabaseHelper(
             scopeManager,
             new TransientFailureCommandFactory(),
@@ -48,7 +48,7 @@ public sealed class DatabaseHelperResilienceTests
             CreateResilienceStrategy(options.Resilience),
             NullLogger<DatabaseHelper>.Instance,
             telemetry,
-            features,
+            runtimeOptions,
             Array.Empty<IValidator<DbCommandRequest>>(),
             rowMapperFactory);
 
@@ -93,16 +93,16 @@ public sealed class DatabaseHelperResilienceTests
     {
         private readonly SuccessfulDbCommand _command = new();
 
-        public DbCommand Rent(DbConnection connection, DbCommandRequest request)
+        public DbCommand GetCommand(DbConnection connection, DbCommandRequest request)
         {
             _command.Attach(connection);
             return _command;
         }
 
-        public Task<DbCommand> RentAsync(DbConnection connection, DbCommandRequest request, CancellationToken cancellationToken = default)
-            => Task.FromResult(Rent(connection, request));
+        public Task<DbCommand> GetCommandAsync(DbConnection connection, DbCommandRequest request, CancellationToken cancellationToken = default)
+            => Task.FromResult(GetCommand(connection, request));
 
-        public void Return(DbCommand command) { }
+        public void ReturnCommand(DbCommand command) { }
     }
 
     private sealed class SuccessfulDbCommand : DbCommand

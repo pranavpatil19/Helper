@@ -1,13 +1,12 @@
-using DataAccessLayer.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DataAccessLayer.Telemetry;
 
 internal static class TelemetryServiceCollectionExtensions
 {
-    public static void AddDalTelemetry(this IServiceCollection services, DalFeatures features)
+    public static void AddDalTelemetry(this IServiceCollection services, bool enableTelemetry)
     {
-        if (features.Telemetry)
+        if (enableTelemetry)
         {
             services.AddSingleton<IDataAccessTelemetry, DataAccessTelemetry>();
         }

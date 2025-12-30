@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using DataAccessLayer.Transactions;
 
 namespace DataAccessLayer.Execution;
 
@@ -38,7 +39,37 @@ public static class DbCommandRequestExtensions
             Transaction = request.Transaction,
             OverrideOptions = request.OverrideOptions,
             CommandBehavior = request.CommandBehavior,
-            TraceName = request.TraceName
+            TraceName = request.TraceName ?? commandText
+        };
+    }
+    /// <summary>
+    /// Clones the request and binds it to the supplied <see cref="ITransactionScope"/> so the caller does not need
+    /// to manually assign the connection/transaction or worry about closing scope-owned connections.
+    /// </summary>
+    /// <param name="request">Original request definition.</param>
+    /// <param name="scope">Active transaction scope that owns the connection.</param>
+    /// <param name="closeConnection">
+    /// When <c>true</c>, the helper closes the scope connection after execution. Defaults to <c>false</c> because the scope controls disposal.
+    /// </param>
+    public static DbCommandRequest WithScope(this DbCommandRequest request, ITransactionScope scope, bool closeConnection = false)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(scope);
+
+        return new DbCommandRequest
+        {
+            CommandText = request.CommandText,
+            CommandType = request.CommandType,
+            Parameters = request.Parameters,
+            CommandTimeoutSeconds = request.CommandTimeoutSeconds,
+            PrepareCommand = request.PrepareCommand,
+            Connection = scope.Connection,
+            CloseConnection = closeConnection,
+            Transaction = scope.Transaction,
+            OverrideOptions = request.OverrideOptions,
+            CommandBehavior = request.CommandBehavior,
+            TraceName = request.TraceName ?? request.CommandText,
+            SkipValidation = request.SkipValidation
         };
     }
 }

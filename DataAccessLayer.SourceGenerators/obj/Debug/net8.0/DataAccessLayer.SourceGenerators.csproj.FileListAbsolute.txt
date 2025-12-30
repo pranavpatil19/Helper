@@ -10,3 +10,4 @@
 /Users/pranavpatil/Desktop/Helper/DataAccessLayer.SourceGenerators/obj/Debug/net8.0/refint/DataAccessLayer.SourceGenerators.dll
 /Users/pranavpatil/Desktop/Helper/DataAccessLayer.SourceGenerators/obj/Debug/net8.0/DataAccessLayer.SourceGenerators.pdb
 /Users/pranavpatil/Desktop/Helper/DataAccessLayer.SourceGenerators/obj/Debug/net8.0/ref/DataAccessLayer.SourceGenerators.dll
+/Users/pranavpatil/Desktop/Helper/DataAccessLayer.SourceGenerators/obj/Debug/net8.0/DataAccessLayer.SourceGenerators.sourcelink.json

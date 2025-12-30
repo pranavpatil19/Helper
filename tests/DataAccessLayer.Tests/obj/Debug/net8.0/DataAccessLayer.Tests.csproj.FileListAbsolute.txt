@@ -159,9 +159,6 @@
 /Users/pranavpatil/Desktop/Helper/tests/DataAccessLayer.Tests/bin/Debug/net8.0/Polly.Core.dll
 /Users/pranavpatil/Desktop/Helper/tests/DataAccessLayer.Tests/bin/Debug/net8.0/Microsoft.EntityFrameworkCore.InMemory.dll
 /Users/pranavpatil/Desktop/Helper/tests/DataAccessLayer.Tests/bin/Debug/net8.0/FluentValidation.dll
-/Users/pranavpatil/Desktop/Helper/tests/DataAccessLayer.Tests/bin/Debug/net8.0/DataAccessLayer.Ado.dll
-/Users/pranavpatil/Desktop/Helper/tests/DataAccessLayer.Tests/bin/Debug/net8.0/DataAccessLayer.Ef.dll
-/Users/pranavpatil/Desktop/Helper/tests/DataAccessLayer.Tests/bin/Debug/net8.0/DataAccessLayer.Ado.pdb
-/Users/pranavpatil/Desktop/Helper/tests/DataAccessLayer.Tests/bin/Debug/net8.0/DataAccessLayer.Ef.pdb
 /Users/pranavpatil/Desktop/Helper/tests/DataAccessLayer.Tests/bin/Debug/net8.0/linq2db.dll
 /Users/pranavpatil/Desktop/Helper/tests/DataAccessLayer.Tests/bin/Debug/net8.0/linq2db.EntityFrameworkCore.dll
+/Users/pranavpatil/Desktop/Helper/tests/DataAccessLayer.Tests/obj/Debug/net8.0/DataAccessLayer.Tests.sourcelink.json

@@ -236,7 +236,7 @@ public sealed class DatabaseHelperIntegrationTests
         var helperOptions = new DbHelperOptions();
         var telemetry = new DataAccessTelemetry(helperOptions);
         var rowMapperFactory = new RowMapperFactory(helperOptions);
-        var features = DalFeatures.Default;
+        var runtimeOptions = new DalRuntimeOptions();
         return new DatabaseHelper(
             scopeManager,
             new StubCommandFactory(command),
@@ -244,7 +244,7 @@ public sealed class DatabaseHelperIntegrationTests
             new ResilienceStrategy(options.Resilience, NullLogger<ResilienceStrategy>.Instance),
             NullLogger<DatabaseHelper>.Instance,
             telemetry,
-            features,
+            runtimeOptions,
             Array.Empty<IValidator<DbCommandRequest>>(),
             rowMapperFactory);
     }
@@ -260,7 +260,7 @@ public sealed class DatabaseHelperIntegrationTests
     {
         private readonly FakeCommand _command;
         public StubCommandFactory(FakeCommand command) => _command = command;
-        public DbCommand Rent(DbConnection connection, DbCommandRequest request)
+        public DbCommand GetCommand(DbConnection connection, DbCommandRequest request)
         {
             _command.Request = request;
             _command.BindParameters(request.Parameters);
@@ -269,9 +269,9 @@ public sealed class DatabaseHelperIntegrationTests
             return _command;
         }
 
-        public Task<DbCommand> RentAsync(DbConnection connection, DbCommandRequest request, CancellationToken cancellationToken = default) =>
-            Task.FromResult(Rent(connection, request));
-        public void Return(DbCommand command) { }
+        public Task<DbCommand> GetCommandAsync(DbConnection connection, DbCommandRequest request, CancellationToken cancellationToken = default) =>
+            Task.FromResult(GetCommand(connection, request));
+        public void ReturnCommand(DbCommand command) { }
     }
 
     private sealed class FakeConnection : DbConnection

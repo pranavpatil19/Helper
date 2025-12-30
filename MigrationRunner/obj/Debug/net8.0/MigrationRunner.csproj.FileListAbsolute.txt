@@ -101,3 +101,4 @@
 /Users/pranavpatil/Desktop/Helper/MigrationRunner/bin/Debug/net8.0/Polly.Core.dll
 /Users/pranavpatil/Desktop/Helper/MigrationRunner/bin/Debug/net8.0/linq2db.dll
 /Users/pranavpatil/Desktop/Helper/MigrationRunner/bin/Debug/net8.0/linq2db.EntityFrameworkCore.dll
+/Users/pranavpatil/Desktop/Helper/MigrationRunner/obj/Debug/net8.0/MigrationRunner.sourcelink.json

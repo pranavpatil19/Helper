@@ -21,7 +21,7 @@ namespace DataAccessLayer.Tests;
 public sealed class DbCommandFactoryTests
 {
     [Fact]
-    public void RentAndReturn_ReusesCommandInstances()
+    public void GetCommandAndReturn_ReusesCommandInstances()
     {
         var factory = new DbCommandFactory(
             new NoOpParameterBinder(),
@@ -32,15 +32,15 @@ public sealed class DbCommandFactoryTests
         connection.Open();
         var request = new DbCommandRequest { CommandText = "SELECT 1" };
 
-        var command1 = factory.Rent(connection, request);
-        factory.Return(command1);
+        var command1 = factory.GetCommand(connection, request);
+        factory.ReturnCommand(command1);
 
-        var command2 = factory.Rent(connection, request);
+        var command2 = factory.GetCommand(connection, request);
         Assert.Same(command1, command2);
     }
 
     [Fact]
-    public void Rent_DisabledPooling_DoesNotReuse()
+    public void GetCommand_DisabledPooling_DoesNotReuse()
     {
         var options = new CommandPoolOptions { EnableCommandPooling = false };
         var factory = new DbCommandFactory(
@@ -52,10 +52,10 @@ public sealed class DbCommandFactoryTests
         connection.Open();
         var request = new DbCommandRequest { CommandText = "SELECT 1" };
 
-        var command1 = factory.Rent(connection, request);
-        factory.Return(command1);
+        var command1 = factory.GetCommand(connection, request);
+        factory.ReturnCommand(command1);
 
-        var command2 = factory.Rent(connection, request);
+        var command2 = factory.GetCommand(connection, request);
         Assert.NotSame(command1, command2);
     }
 
@@ -77,18 +77,18 @@ public sealed class DbCommandFactoryTests
             Parameters = DbParameterCollectionBuilder.FromAnonymous(new { Id = 1 })
         };
 
-        var command1 = factory.Rent(connection, request);
+        var command1 = factory.GetCommand(connection, request);
         var parameter1 = command1.Parameters[0];
-        factory.Return(command1);
+        factory.ReturnCommand(command1);
 
-        var command2 = factory.Rent(connection, request);
+        var command2 = factory.GetCommand(connection, request);
         var parameter2 = command2.Parameters[0];
 
         Assert.Same(parameter1, parameter2);
     }
 
     [Fact]
-    public void Rent_AppliesDefaultCommandTimeout_WhenRequestDoesNotSpecify()
+    public void GetCommand_AppliesDefaultCommandTimeout_WhenRequestDoesNotSpecify()
     {
         var defaults = CreateDefaults(commandTimeout: 90);
         var factory = new DbCommandFactory(
@@ -100,13 +100,13 @@ public sealed class DbCommandFactoryTests
         connection.Open();
         var request = new DbCommandRequest { CommandText = "SELECT 1" };
 
-        var command = factory.Rent(connection, request);
+        var command = factory.GetCommand(connection, request);
 
         Assert.Equal(90, command.CommandTimeout);
     }
 
     [Fact]
-    public void Rent_AppliesOverrideCommandTimeout_BeforeDefaults()
+    public void GetCommand_AppliesOverrideCommandTimeout_BeforeDefaults()
     {
         var defaults = CreateDefaults(commandTimeout: 90);
         var overrides = CreateDefaults(commandTimeout: 15);
@@ -123,13 +123,13 @@ public sealed class DbCommandFactoryTests
             OverrideOptions = overrides
         };
 
-        var command = factory.Rent(connection, request);
+        var command = factory.GetCommand(connection, request);
 
         Assert.Equal(15, command.CommandTimeout);
     }
 
     [Fact]
-    public void Rent_HonorsExplicitCommandTimeout_OnRequest()
+    public void GetCommand_HonorsExplicitCommandTimeout_OnRequest()
     {
         var defaults = CreateDefaults(commandTimeout: 90);
         var factory = new DbCommandFactory(
@@ -145,13 +145,13 @@ public sealed class DbCommandFactoryTests
             CommandTimeoutSeconds = 5
         };
 
-        var command = factory.Rent(connection, request);
+        var command = factory.GetCommand(connection, request);
 
         Assert.Equal(5, command.CommandTimeout);
     }
 
     [Fact]
-    public void Rent_LogsTimeout_WhenDiagnosticsEnabled()
+    public void GetCommand_LogsTimeout_WhenDiagnosticsEnabled()
     {
         var logger = new TestLogger<DbCommandFactory>();
         var defaults = CreateDefaults(commandTimeout: 30, logTimeouts: true);
@@ -165,7 +165,7 @@ public sealed class DbCommandFactoryTests
         connection.Open();
         var request = new DbCommandRequest { CommandText = "SELECT 1" };
 
-        _ = factory.Rent(connection, request);
+        _ = factory.GetCommand(connection, request);
 
         Assert.Single(logger.Entries);
         Assert.Contains("30", logger.Entries[0].Message);
@@ -173,7 +173,7 @@ public sealed class DbCommandFactoryTests
     }
 
     [Fact]
-    public void Rent_DoesNotLogTimeout_WhenDiagnosticsDisabled()
+    public void GetCommand_DoesNotLogTimeout_WhenDiagnosticsDisabled()
     {
         var logger = new TestLogger<DbCommandFactory>();
         var defaults = CreateDefaults(commandTimeout: 30, logTimeouts: false);
@@ -187,7 +187,7 @@ public sealed class DbCommandFactoryTests
         connection.Open();
         var request = new DbCommandRequest { CommandText = "SELECT 1" };
 
-        _ = factory.Rent(connection, request);
+        _ = factory.GetCommand(connection, request);
 
         Assert.Empty(logger.Entries);
     }
@@ -210,7 +210,7 @@ public sealed class DbCommandFactoryTests
             }
         };
 
-        var command = factory.Rent(connection, request);
+        var command = factory.GetCommand(connection, request);
 
         Assert.Equal("SELECT * FROM Orders WHERE Id IN (@Ids_0,@Ids_1,@Ids_2)", command.CommandText);
         Assert.Equal(3, command.Parameters.Count);
@@ -239,7 +239,7 @@ public sealed class DbCommandFactoryTests
             ]
         };
 
-        var command = factory.Rent(connection, request);
+        var command = factory.GetCommand(connection, request);
 
         Assert.Single(command.Parameters);
         var parameter = command.Parameters[0];
@@ -268,7 +268,7 @@ public sealed class DbCommandFactoryTests
             ]
         };
 
-        var command = factory.Rent(connection, request);
+        var command = factory.GetCommand(connection, request);
 
         Assert.Single(command.Parameters);
         var parameter = command.Parameters[0];
@@ -320,7 +320,7 @@ public sealed class DbCommandFactoryTests
             ]
         };
 
-        var command = factory.Rent(connection, request);
+        var command = factory.GetCommand(connection, request);
 
         Assert.Equal(6, command.Parameters.Count);
         var parameters = command.Parameters.Cast<DbParameter>().ToDictionary(p => p.ParameterName);

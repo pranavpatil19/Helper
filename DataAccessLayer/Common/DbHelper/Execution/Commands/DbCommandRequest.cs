@@ -72,4 +72,10 @@ public sealed class DbCommandRequest
     /// Gets or sets an optional label used in telemetry/logging pipelines.
     /// </summary>
     public string? TraceName { get; init; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether FluentValidation validators should be skipped for this request.
+    /// Validation remains enabled by default to keep guardrails on every call.
+    /// </summary>
+    public bool SkipValidation { get; init; }
 }

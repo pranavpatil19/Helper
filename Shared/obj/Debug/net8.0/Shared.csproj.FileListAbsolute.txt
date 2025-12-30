@@ -9,3 +9,4 @@
 /Users/pranavpatil/Desktop/Helper/Shared/obj/Debug/net8.0/refint/Shared.dll
 /Users/pranavpatil/Desktop/Helper/Shared/obj/Debug/net8.0/Shared.pdb
 /Users/pranavpatil/Desktop/Helper/Shared/obj/Debug/net8.0/ref/Shared.dll
+/Users/pranavpatil/Desktop/Helper/Shared/obj/Debug/net8.0/Shared.sourcelink.json

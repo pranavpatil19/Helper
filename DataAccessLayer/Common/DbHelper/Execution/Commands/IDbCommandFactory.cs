@@ -10,19 +10,19 @@ namespace DataAccessLayer.Execution;
 /// </summary>
 /// <remarks>
 /// Downstream code typically builds requests with <see cref="DbParameterCollectionBuilder"/> so every parameter includes
-/// an explicit <see cref="System.Data.DbType"/> before renting commands.
+/// an explicit <see cref="System.Data.DbType"/> before getting commands.
 /// </remarks>
 public interface IDbCommandFactory
 {
     /// <summary>
-    /// Rents a pooled <see cref="DbCommand"/> configured for the given request.
+    /// Gets a pooled <see cref="DbCommand"/> configured for the given request.
     /// </summary>
-    DbCommand Rent(DbConnection connection, DbCommandRequest request);
+    DbCommand GetCommand(DbConnection connection, DbCommandRequest request);
 
     /// <summary>
-    /// Rents a pooled <see cref="DbCommand"/> configured for the given request.
+    /// Gets a pooled <see cref="DbCommand"/> configured for the given request.
     /// </summary>
-    Task<DbCommand> RentAsync(
+    Task<DbCommand> GetCommandAsync(
         DbConnection connection,
         DbCommandRequest request,
         CancellationToken cancellationToken = default);
@@ -30,5 +30,5 @@ public interface IDbCommandFactory
     /// <summary>
     /// Returns the command to the underlying pool.
     /// </summary>
-    void Return(DbCommand command);
+    void ReturnCommand(DbCommand command);
 }

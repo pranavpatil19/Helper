@@ -15,3 +15,4 @@
 /Users/pranavpatil/Desktop/Helper/DataAccessLayer/obj/Debug/net8.0/DataAcce.E67BD773.Up2Date
 /Users/pranavpatil/Desktop/Helper/DataAccessLayer/bin/Debug/net8.0/DataAccessLayer.runtimeconfig.json
 /Users/pranavpatil/Desktop/Helper/DataAccessLayer/obj/Debug/net8.0/DataAccessLayer.genruntimeconfig.cache
+/Users/pranavpatil/Desktop/Helper/DataAccessLayer/obj/Debug/net8.0/DataAccessLayer.sourcelink.json

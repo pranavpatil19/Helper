@@ -1,8 +1,7 @@
 using System.Threading.Tasks;
 using DataAccessLayer.Configuration;
+using DataAccessLayer.EF;
 using DataAccessLayer.Database.ECM.DbContexts;
-using DataAccessLayer.Database.ECM.Interfaces;
-using DataAccessLayer.Database.ECM.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Configuration;
 using Xunit;
@@ -35,10 +34,11 @@ public sealed class EcmDbContextRegistrationTests
         await using var context = await factory.CreateDbContextAsync();
 
         Assert.IsType(expectedType, context);
+        Assert.IsType<MigrationService>(providerInstance.GetRequiredService<IMigrationService>());
     }
 
     [Fact]
-    public void AddDataAccessLayer_WithEfHelpersDisabled_DoesNotRegisterContextFactory()
+    public void AddEcmEntityFrameworkSupport_CanSkipDefaultServices()
     {
         var services = new ServiceCollection();
         services.AddLogging();
@@ -50,14 +50,10 @@ public sealed class EcmDbContextRegistrationTests
             WrapProviderExceptions = false
         };
 
-        using var featureOverride = DalFeatureDefaults.Override(_ => DalFeatures.Default with { EfHelpers = false });
-
         services.AddDataAccessLayer(options);
-        services.AddEcmEntityFrameworkSupport(options);
+        services.AddEcmEntityFrameworkSupport(options, registerDefaultServices: false);
 
         using var providerInstance = services.BuildServiceProvider();
-
-        Assert.Null(providerInstance.GetService<IEcmDbContextFactory>());
-        Assert.Null(providerInstance.GetService<ITodoRepository>());
+        Assert.Null(providerInstance.GetService<IMigrationService>());
     }
 }
