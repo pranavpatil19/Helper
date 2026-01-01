@@ -23,7 +23,7 @@ internal static class DalEfServiceRegistrar
 
         if (registerDefaultServices)
         {
-            services.TryAddScoped<IMigrationService, MigrationService>();
+            services.TryAddScoped<ISchemaMigrationService, SchemaMigrationService>();
         }
 
         RegisterEcmDbContextFactory(services, options, configure);

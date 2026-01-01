@@ -14,7 +14,7 @@ namespace DataAccessLayer.Execution;
 /// <see cref="IDatabaseHelper.QueryAsync{T}(DbCommandRequest, System.Func{System.Data.Common.DbDataReader, T}, System.Threading.CancellationToken)"/>,
 /// <see cref="IDatabaseHelper.Query{T}(DbCommandRequest, System.Func{System.Data.Common.DbDataReader, T})"/>, and the related streaming/load helpers.
 /// Always populate <see cref="Parameters"/> with <see cref="DbParameterDefinition"/> instances (for example via
-/// <see cref="DbParameterCollectionBuilder"/>) so the subsequent provider binding remains deterministic.
+/// <see cref="DataAccessLayer.Execution.Builders.DbParameter"/>) so the subsequent provider binding remains deterministic.
 /// </remarks>
 public sealed class DbCommandRequest
 {
@@ -74,8 +74,9 @@ public sealed class DbCommandRequest
     public string? TraceName { get; init; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether FluentValidation validators should be skipped for this request.
-    /// Validation remains enabled by default to keep guardrails on every call.
+    /// <summary>
+    /// Gets or sets a value indicating whether FluentValidation validators should run (true by default).
+    /// Set to <c>false</c> only when inputs are already validated explicitly.
     /// </summary>
-    public bool SkipValidation { get; init; }
+    public bool Validate { get; init; } = true;
 }

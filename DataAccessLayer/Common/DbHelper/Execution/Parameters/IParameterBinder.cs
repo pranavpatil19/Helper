@@ -5,11 +5,11 @@ using Shared.Configuration;
 namespace DataAccessLayer.Execution;
 
 /// <summary>
-/// Binds <see cref="DbParameterDefinition"/> instances to provider-specific <see cref="DbParameter"/> objects,
+/// Binds <see cref="DbParameterDefinition"/> instances to provider-specific <see cref="System.Data.Common.DbParameter"/> objects,
 /// honoring the explicit <see cref="System.Data.DbType"/> and provider metadata configured on each definition.
 /// </summary>
 /// <remarks>
-/// Implementations typically convert normalized definitions created by <see cref="DbParameterCollectionBuilder"/>
+/// Implementations typically convert normalized definitions created by <see cref="DataAccessLayer.Execution.Builders.DbParameter"/>
 /// or <see cref="StructuredParameterBuilder"/> into the concrete parameter classes expected by SQL Server,
 /// PostgreSQL, or Oracle drivers. Every binding operation should carry the <c>DbType</c> forward so provider
 /// inference never strips important metadata such as precision, scale, or array typing.

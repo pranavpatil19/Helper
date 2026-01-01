@@ -4,6 +4,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using DataAccessLayer.Execution.Builders;
 using Shared.Configuration;
 
 namespace DataAccessLayer.Execution;
@@ -279,7 +280,7 @@ public sealed class SqlBuilder
             return CloneParameter(definition, name);
         }
 
-        return DbParameterCollectionBuilder.Input(name, value);
+        return DbParameter.Input(name, value);
     }
 
     private static DbParameterDefinition CloneParameter(DbParameterDefinition source, string name) =>

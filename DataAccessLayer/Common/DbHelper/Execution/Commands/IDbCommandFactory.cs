@@ -9,7 +9,7 @@ namespace DataAccessLayer.Execution;
 /// Provides an extensibility point for creating <see cref="DbCommand"/> instances from a <see cref="DbCommandRequest"/>.
 /// </summary>
 /// <remarks>
-/// Downstream code typically builds requests with <see cref="DbParameterCollectionBuilder"/> so every parameter includes
+/// Downstream code typically builds requests with <see cref="DataAccessLayer.Execution.Builders.DbParameter"/> so every parameter includes
 /// an explicit <see cref="System.Data.DbType"/> before getting commands.
 /// </remarks>
 public interface IDbCommandFactory

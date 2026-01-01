@@ -10,7 +10,7 @@ namespace DataAccessLayer.Execution;
 /// <see cref="DbType"/> and other metadata configured by callers.
 /// </summary>
 /// <remarks>
-/// Instances are typically produced by <see cref="DbParameterCollectionBuilder"/> or
+/// Instances are typically produced by <see cref="DataAccessLayer.Execution.Builders.DbParameter"/> or
 /// <see cref="StructuredParameterBuilder"/> and later materialized into provider parameters
 /// by <see cref="IParameterBinder"/>. Keeping the <see cref="DbType"/> explicit avoids inference
 /// surprises across SQL Server, PostgreSQL, and Oracle.

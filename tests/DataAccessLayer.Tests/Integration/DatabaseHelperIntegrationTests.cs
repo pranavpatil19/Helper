@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DataAccessLayer.Execution;
+using DalParameter = DataAccessLayer.Execution.Builders.DbParameter;
 using DataAccessLayer.Common.DbHelper;
 using DataAccessLayer.Configuration;
 using DataAccessLayer.Mapping;
@@ -63,8 +64,8 @@ public sealed class DatabaseHelperIntegrationTests
             CommandText = "dbo.proc",
             Parameters =
             [
-                DbParameterCollectionBuilder.Input("Id", 1),
-                DbParameterCollectionBuilder.Output("Status", DbType.String)
+                DalParameter.Input("Id", 1),
+                DalParameter.Output("Status", DbType.String)
             ]
         };
 
@@ -91,9 +92,9 @@ public sealed class DatabaseHelperIntegrationTests
             CommandType = CommandType.StoredProcedure,
             Parameters =
             [
-                DbParameterCollectionBuilder.Input("p_id", 1),
-                DbParameterCollectionBuilder.Output("p_status", DbType.String),
-                DbParameterCollectionBuilder.Output("p_reference", DbType.String)
+                DalParameter.Input("p_id", 1),
+                DalParameter.Output("p_status", DbType.String),
+                DalParameter.Output("p_reference", DbType.String)
             ]
         };
 

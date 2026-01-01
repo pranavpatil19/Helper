@@ -9,7 +9,7 @@ namespace DataAccessLayer.Common.DbHelper;
 
 /// <summary>
 /// Default implementation that binds <see cref="DbParameterDefinition"/> objects
-/// to provider-specific <see cref="DbParameter"/> instances.
+/// to provider-specific <see cref="System.Data.Common.DbParameter"/> instances.
 /// </summary>
 public sealed class ParameterBinder : IParameterBinder
 {
@@ -49,6 +49,7 @@ public sealed class ParameterBinder : IParameterBinder
         DbParameterDefinition definition,
         DatabaseProvider provider)
     {
+        ValidateMetadata(definition);
         parameter.ParameterName = NormalizeParameterName(definition.Name, provider);
         parameter.Direction = definition.Direction;
         parameter.IsNullable = definition.IsNullable;
@@ -82,6 +83,62 @@ public sealed class ParameterBinder : IParameterBinder
         {
             ValidateProviderTypeName(definition.ProviderTypeName);
             ApplyProviderTypeName(parameter, definition.ProviderTypeName);
+        }
+    }
+
+    private static void ValidateMetadata(DbParameterDefinition definition)
+    {
+        if (string.IsNullOrWhiteSpace(definition.Name))
+        {
+            throw new ArgumentException("Parameter name cannot be empty.", nameof(definition));
+        }
+
+        if (definition.TreatAsList && definition.Values is null)
+        {
+            throw new ArgumentException(
+                $"Parameter '{definition.Name}' is marked as TreatAsList but does not include a Values collection.",
+                nameof(definition));
+        }
+
+        if (definition.Size is { } size && size <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(definition),
+                $"Parameter '{definition.Name}' size must be greater than zero.");
+        }
+
+        if (definition.Precision is { } precisionValue)
+        {
+            if (precisionValue == 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(definition),
+                    $"Parameter '{definition.Name}' precision must be between 1 and 38.");
+            }
+
+            if (precisionValue > 38)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(definition),
+                    $"Parameter '{definition.Name}' precision {precisionValue} exceeds the maximum supported precision of 38 shared by all providers.");
+            }
+        }
+
+        if (definition.Scale is { } scale)
+        {
+            if (scale > 38)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(definition),
+                    $"Parameter '{definition.Name}' scale {scale} exceeds the maximum supported scale of 38 shared by all providers.");
+            }
+
+            if (definition.Precision is { } precision && scale > precision)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(definition),
+                    $"Parameter '{definition.Name}' scale {scale} cannot exceed precision {precision}.");
+            }
         }
     }
 

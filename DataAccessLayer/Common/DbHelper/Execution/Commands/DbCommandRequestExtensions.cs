@@ -69,7 +69,7 @@ public static class DbCommandRequestExtensions
             OverrideOptions = request.OverrideOptions,
             CommandBehavior = request.CommandBehavior,
             TraceName = request.TraceName ?? request.CommandText,
-            SkipValidation = request.SkipValidation
+            Validate = request.Validate
         };
     }
 }

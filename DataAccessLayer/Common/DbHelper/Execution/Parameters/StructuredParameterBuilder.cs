@@ -21,7 +21,7 @@ public static class StructuredParameterBuilder
     /// <remarks>
     /// Use this helper when SQL Server stored procedures or statements expect TVPs. SQL Client binds TVPs using
     /// the structured type name, so the builder stores it in <see cref="DbParameterDefinition.ProviderTypeName"/>.
-    /// Remember to add other parameters with an explicit <see cref="DbType"/> using <see cref="DbParameterCollectionBuilder"/>.
+    /// Remember to add other parameters with an explicit <see cref="DbType"/> using <see cref="DataAccessLayer.Execution.Builders.DbParameter"/>.
     /// </remarks>
     public static DbParameterDefinition SqlServerTableValuedParameter(
         string name,

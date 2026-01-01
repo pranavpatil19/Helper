@@ -13,7 +13,7 @@ internal sealed class MigrationHostedService(
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         await using var scope = serviceProvider.CreateAsyncScope();
-        var migrationService = scope.ServiceProvider.GetRequiredService<IMigrationService>();
+        var migrationService = scope.ServiceProvider.GetRequiredService<ISchemaMigrationService>();
         var userSynchronizationService = scope.ServiceProvider.GetRequiredService<IUserSynchronizationService>();
 
         logger.LogInformation("Starting database migration runner.");
